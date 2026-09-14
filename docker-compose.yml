@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: kuda
+      POSTGRES_USER: kuda
+      POSTGRES_PASSWORD: change-this-password
+    volumes:
+      - kuda_pg:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  web:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg://kuda:change-this-password@db:5432/kuda
+      SECRET_KEY: change-this-long-random-secret
+      ADMIN_LOGIN: admin
+      ADMIN_PASSWORD: change-this-admin-password
+      PUBLIC_BASE_URL: http://localhost:8000
+      COOKIE_SECURE: "false"
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+volumes:
+  kuda_pg:
